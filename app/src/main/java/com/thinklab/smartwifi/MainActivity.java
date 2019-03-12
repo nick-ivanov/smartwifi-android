@@ -3,9 +3,11 @@ package com.thinklab.smartwifi;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.TextView;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,21 +18,27 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            Fragment selectedFragment = null;
             switch (item.getItemId()) {
                 case R.id.navigation_hotspots:
                     mTextMessage.setText(R.string.title_hotspots);
-                    return true;
+                    selectedFragment = new HotspotFragment();
+                    break;
                 case R.id.navigation_connection:
                     mTextMessage.setText(R.string.title_connection);
-                    return true;
+                    selectedFragment = new ConnectionFragment();
+                    break;
                 case R.id.navigation_settings:
                     mTextMessage.setText(R.string.title_settings);
-                    return true;
+                    selectedFragment = new SettingsFragment();
+                    break;
                 case R.id.navigation_about:
                     mTextMessage.setText(R.string.title_about);
-                    return true;
+                    selectedFragment = new AboutFragment();
+                    break;
             }
-            return false;
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
+            return true;
         }
     };
 
@@ -42,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HotspotFragment()).commit();
     }
+
 
 }
