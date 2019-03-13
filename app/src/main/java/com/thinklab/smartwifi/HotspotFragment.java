@@ -22,12 +22,13 @@ import android.widget.Toast;
 import android.text.InputType;
 import android.widget.*;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
 import com.thanosfisherman.wifiutils.WifiUtils;
 
-public class HotspotFragment extends Fragment{
+public class HotspotFragment extends Fragment {
     private WifiManager wifiManager;
     private static WifiReceiver wifiReceiver;
     private ListView listView;
@@ -43,21 +44,6 @@ public class HotspotFragment extends Fragment{
         wifiReceiver = new WifiReceiver();
         View view = inflater.inflate(R.layout.fragment_hotspots, container, false);
         listView = (ListView) view.findViewById(R.id.wifiList);
-
-        final AlertDialog.Builder myAlertDialog2 = new AlertDialog.Builder(getActivity());
-        myAlertDialog2.setTitle("Warning");
-        myAlertDialog2.setMessage("Location services must be ON to scan hotspots. To change this go to settings, apps, SmartWifi, Permissions");
-        myAlertDialog2.setPositiveButton("Ok" , new DialogInterface.OnClickListener() {
-
-            public void onClick(DialogInterface dialog, int which) {
-                return;
-            }
-        });
-
-        myAlertDialog2.show();
-
-
-
 
         if (!wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(true);
