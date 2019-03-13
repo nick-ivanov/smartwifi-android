@@ -109,10 +109,12 @@ public class HotspotFragment extends Fragment {
                 String action = intent.getAction();
                 if (action.equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
                     results = wifiManager.getScanResults();
-                    if (results.size() > 0 && !results.equals("")) {
+                    if (results.size() > 0) {
                         for (ScanResult scanResult : results) {
-                            arrayList.add(scanResult.SSID);
-                            adapter.notifyDataSetChanged();
+                            if(!scanResult.SSID.equals("")) {
+                                arrayList.add(scanResult.SSID);
+                                adapter.notifyDataSetChanged();
+                            }
                         }
 
                     } else {
