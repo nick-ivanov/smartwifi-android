@@ -69,17 +69,19 @@ public class HotspotFragment extends Fragment {
                         WifiUtils.withContext(getContext()) //Attempt to connect
                                 .connectWith(ssid, input.getText().toString())
                                 .onConnectionResult(this::checkResult)
-                                .start();
+                                .start(); //Credit to https://github.com/ThanosFisherman/WifiUtils for this library
                     }
-                    private void checkResult(boolean isSuccess) {
+                    private void checkResult(boolean isSuccess) { //Credit to https://github.com/ThanosFisherman/WifiUtils for checkResult function, found in his example
                         Toast wifiSuccessToast = Toast.makeText(getActivity(),"Successfully connected", Toast.LENGTH_SHORT );
                         Toast wifiFailToast = Toast.makeText(getActivity(),"Failed to connect", Toast.LENGTH_LONG );
                         wifiFailToast.setGravity(Gravity.CENTER, 0 ,0);
                         wifiSuccessToast.setGravity(Gravity.CENTER, 0 ,0);
-                        if (isSuccess)
+                        if (isSuccess) {
                             wifiSuccessToast.show();
-                        else
+                        }
+                        else {
                             wifiFailToast.show();
+                        }
                     }
                 });
                 myAlertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -91,7 +93,7 @@ public class HotspotFragment extends Fragment {
 
             }
         });
-        scanWifi();
+        scanWifi(); //scan for AP's
         return view;
         }
 
@@ -103,9 +105,15 @@ public class HotspotFragment extends Fragment {
             Toast.makeText(getContext(), "Scanning", Toast.LENGTH_SHORT).show();
         }
 
-
+        /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+         * WifiReceiver Class gets all AP's and displays them in a     *
+         * list. Does not display if there are no AP's or if an AP     *
+         * has a blank SSID.                                           *
+         * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
         class WifiReceiver extends BroadcastReceiver {
             public void onReceive(Context c, Intent intent) {
+                arrayList.clear();
+                adapter.notifyDataSetChanged();
                 String action = intent.getAction();
                 if (action.equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
                     results = wifiManager.getScanResults();
@@ -122,8 +130,6 @@ public class HotspotFragment extends Fragment {
                     }
                 }
             }
-
-
         }
 
 }
