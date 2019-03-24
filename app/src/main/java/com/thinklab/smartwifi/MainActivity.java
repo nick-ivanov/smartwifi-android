@@ -25,13 +25,13 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             Fragment selectedFragment = null;
             switch (item.getItemId()) {
-                case R.id.navigation_hotspots:
-                    mTextMessage.setText(R.string.title_hotspots);
-                    selectedFragment = new HotspotFragment();
-                    break;
                 case R.id.navigation_connection:
                     mTextMessage.setText(R.string.title_connection);
                     selectedFragment = new ConnectionFragment();
+                    break;
+                case R.id.navigation_hotspots:
+                    mTextMessage.setText(R.string.title_hotspots);
+                    selectedFragment = new HotspotFragment();
                     break;
                 case R.id.navigation_settings:
                     mTextMessage.setText(R.string.title_settings);
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HotspotFragment()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ConnectionFragment()).commit();
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1001);
         }

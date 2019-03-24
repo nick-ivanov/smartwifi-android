@@ -22,7 +22,7 @@
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:text="@string/title_hotspots" />
+        android:text="@string/title_connection" />
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"
