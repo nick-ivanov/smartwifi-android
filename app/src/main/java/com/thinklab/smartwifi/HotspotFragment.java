@@ -23,6 +23,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.text.InputType;
 import android.widget.*;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 
@@ -32,7 +35,6 @@ import java.util.List;
 import com.thanosfisherman.wifiutils.WifiUtils;
 
 public class HotspotFragment extends Fragment {
-    OnHeadlineSelectedListener callback;
     private WifiManager wifiManager;
     private WifiInfo wifiInfo;
     private static WifiReceiver wifiReceiver;
@@ -40,13 +42,8 @@ public class HotspotFragment extends Fragment {
     private List<ScanResult> results;
     private ArrayList<String> arrayList = new ArrayList<>();
     private ArrayAdapter adapter;
+    SwipeRefreshLayout pullToRefresh;
 
-
-    // This interface can be implemented by the Activity, parent Fragment,
-    // or a separate test implementation.
-    public interface OnHeadlineSelectedListener {
-        void onConnected(boolean connected);
-    }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -70,6 +67,7 @@ public class HotspotFragment extends Fragment {
         wifiReceiver = new WifiReceiver();
         View view = inflater.inflate(R.layout.fragment_hotspots, container, false);
         listView = (ListView) view.findViewById(R.id.wifiList);
+        pullToRefresh = (SwipeRefreshLayout) view.findViewById(R.id.pullToRefresh);
 
         if (!wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(true);
@@ -77,48 +75,58 @@ public class HotspotFragment extends Fragment {
         setRetainInstance(true);
         this.adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, arrayList);
         listView.setAdapter(this.adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                        final AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(getActivity());
+                        final String ssid = listView.getItemAtPosition(position).toString();
+                        final EditText input = new EditText(getActivity());
+
+                        myAlertDialog.setTitle(listView.getItemAtPosition(position).toString());
+                        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+                        myAlertDialog.setView(input);
+                        myAlertDialog.setMessage("Please enter the password");
+
+                        myAlertDialog.setPositiveButton("Connect", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                WifiUtils.withContext(getContext()) //Attempt to connect
+                                        .connectWith(ssid, input.getText().toString())
+                                        .onConnectionResult(this::checkResult)
+                                        .start(); //Credit to https://github.com/ThanosFisherman/WifiUtils for this library
+                            }
+
+                            private void checkResult(boolean isSuccess) { //Credit to https://github.com/ThanosFisherman/WifiUtils for checkResult function, found in his example
+                                Toast wifiSuccessToast = Toast.makeText(getActivity(), "Successfully connected", Toast.LENGTH_SHORT);
+                                Toast wifiFailToast = Toast.makeText(getActivity(), "Failed to connect", Toast.LENGTH_LONG);
+                                wifiFailToast.setGravity(Gravity.CENTER, 0, 0);
+                                wifiSuccessToast.setGravity(Gravity.CENTER, 0, 0);
+                                if (isSuccess) {
+                                    wifiSuccessToast.show();
+                                    ConnectionFragment f = (ConnectionFragment) getFragmentManager().findFragmentByTag("connection");
+                                    f.setConnectedStatus(true);
+                                } else {
+                                    wifiFailToast.show();
+                                    ConnectionFragment f = (ConnectionFragment) getFragmentManager().findFragmentByTag("connection");
+                                    f.setConnectedStatus(false);
+                                }
+                            }
+                        });
+                        myAlertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                return;
+                            }
+                        });
+                        myAlertDialog.show();
+
+                    }
+
+                });
+        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                final AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(getActivity());
-                final String ssid = listView.getItemAtPosition(position).toString();
-                final EditText input = new EditText(getActivity());
-
-                myAlertDialog.setTitle(listView.getItemAtPosition(position).toString());
-                input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-
-                myAlertDialog.setView(input);
-                myAlertDialog.setMessage("Please enter the password");
-
-                myAlertDialog.setPositiveButton("Connect", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        WifiUtils.withContext(getContext()) //Attempt to connect
-                                .connectWith(ssid, input.getText().toString())
-                                .onConnectionResult(this::checkResult)
-                                .start(); //Credit to https://github.com/ThanosFisherman/WifiUtils for this library
-                    }
-                    private void checkResult(boolean isSuccess) { //Credit to https://github.com/ThanosFisherman/WifiUtils for checkResult function, found in his example
-                        Toast wifiSuccessToast = Toast.makeText(getActivity(),"Successfully connected", Toast.LENGTH_SHORT );
-                        Toast wifiFailToast = Toast.makeText(getActivity(),"Failed to connect", Toast.LENGTH_LONG );
-                        wifiFailToast.setGravity(Gravity.CENTER, 0 ,0);
-                        wifiSuccessToast.setGravity(Gravity.CENTER, 0 ,0);
-                        if (isSuccess) {
-                            //callback.onConnected(true);
-                            wifiSuccessToast.show();
-                        }
-                        else {
-                            wifiFailToast.show();
-                            //callback.onConnected(false);
-                        }
-                    }
-                });
-                myAlertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        return;
-                    }
-                });
-                myAlertDialog.show();
-
+            public void onRefresh() {
+                scanWifi(); //scan for AP's
+                pullToRefresh.setRefreshing(false);
             }
         });
         scanWifi(); //scan for AP's
@@ -161,10 +169,10 @@ public class HotspotFragment extends Fragment {
                     if (results.size() > 0) {
                         for (ScanResult scanResult : results) {
                             if (!scanResult.SSID.equals("")) {
-                                //if (isSmartConnection(scanResult.SSID)) {
+                                if (isSmartConnection(scanResult.SSID)) {
                                     arrayList.add(scanResult.SSID);
                                     adapter.notifyDataSetChanged();
-                                //}
+                                }
                             }
                         }
                     }

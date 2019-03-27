@@ -1,5 +1,6 @@
 package com.thinklab.smartwifi;
 
+import android.graphics.Color;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,6 +30,7 @@ public class ConnectionFragment extends Fragment {
     public void setConnectedStatus(boolean connected) {
         if(connected){
             connectionBool.setText("Connected");
+            connectionBool.setTextColor(Color.GREEN);
         }
         else{
             connectionBool.setText("Dissconnected");
