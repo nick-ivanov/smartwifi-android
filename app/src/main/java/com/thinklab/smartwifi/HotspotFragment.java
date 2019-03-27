@@ -2,6 +2,7 @@ package com.thinklab.smartwifi;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -24,6 +25,8 @@ import android.widget.Toast;
 import android.text.InputType;
 import android.widget.*;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -69,6 +72,7 @@ public class HotspotFragment extends Fragment {
         listView = (ListView) view.findViewById(R.id.wifiList);
         pullToRefresh = (SwipeRefreshLayout) view.findViewById(R.id.pullToRefresh);
 
+
         if (!wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(true);
         }
@@ -102,13 +106,20 @@ public class HotspotFragment extends Fragment {
                                 wifiFailToast.setGravity(Gravity.CENTER, 0, 0);
                                 wifiSuccessToast.setGravity(Gravity.CENTER, 0, 0);
                                 if (isSuccess) {
-                                    wifiSuccessToast.show();
                                     ConnectionFragment f = (ConnectionFragment) getFragmentManager().findFragmentByTag("connection");
-                                    f.setConnectedStatus(true);
+                                    f.setIpAddress(true, getIpAddr());
+                                    f.setConnectionClock(true);
+                                    f.setConnectedStatus(true);//we are connected
+                                    f.showDisconnect(true);
+                                    wifiSuccessToast.show();
+
                                 } else {
                                     wifiFailToast.show();
                                     ConnectionFragment f = (ConnectionFragment) getFragmentManager().findFragmentByTag("connection");
                                     f.setConnectedStatus(false);
+                                    f.setIpAddress(false, "");
+                                    f.setConnectionClock(false);
+                                    f.showDisconnect(false);
                                 }
                             }
                         });
@@ -141,6 +152,20 @@ public class HotspotFragment extends Fragment {
             Toast.makeText(getContext(), "Scanning", Toast.LENGTH_SHORT).show();
         }
 
+    public String getIpAddr() {
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        int ip = wifiInfo.getIpAddress();
+
+        String ipString = String.format(
+                "%d.%d.%d.%d",
+                (ip & 0xff),
+                (ip >> 8 & 0xff),
+                (ip >> 16 & 0xff),
+                (ip >> 24 & 0xff));
+
+        return ipString;
+    }
+
         /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
          * WifiReceiver Class gets all AP's and displays them in a     *
          * list. Does not display if there are no AP's or if an AP     *
@@ -160,10 +185,12 @@ public class HotspotFragment extends Fragment {
                     return false;
             }
 
+            @Override
             public void onReceive(Context c, Intent intent) {
                 arrayList.clear();
                 adapter.notifyDataSetChanged();
                 String action = intent.getAction();
+
                 if (action.equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)) {
                     results = wifiManager.getScanResults();
                     if (results.size() > 0) {
@@ -182,6 +209,8 @@ public class HotspotFragment extends Fragment {
 
                 }
             }
+
+
 
         }
 
