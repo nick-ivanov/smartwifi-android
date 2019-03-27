@@ -2,10 +2,12 @@ package com.thinklab.smartwifi;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.net.wifi.WifiInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Patterns;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +23,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.text.InputType;
 import android.widget.*;
+import android.util.Log;
 
 
 import java.util.ArrayList;
@@ -29,7 +32,9 @@ import java.util.List;
 import com.thanosfisherman.wifiutils.WifiUtils;
 
 public class HotspotFragment extends Fragment {
+    OnHeadlineSelectedListener callback;
     private WifiManager wifiManager;
+    private WifiInfo wifiInfo;
     private static WifiReceiver wifiReceiver;
     private ListView listView;
     private List<ScanResult> results;
@@ -37,9 +42,30 @@ public class HotspotFragment extends Fragment {
     private ArrayAdapter adapter;
 
 
+    // This interface can be implemented by the Activity, parent Fragment,
+    // or a separate test implementation.
+    public interface OnHeadlineSelectedListener {
+        void onConnected(boolean connected);
+    }
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            //Restore the fragment's state here
+        }
+    }
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        //Save the fragment's state here
+    }
+
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiReceiver = new WifiReceiver();
         View view = inflater.inflate(R.layout.fragment_hotspots, container, false);
@@ -48,7 +74,7 @@ public class HotspotFragment extends Fragment {
         if (!wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(true);
         }
-
+        setRetainInstance(true);
         this.adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, arrayList);
         listView.setAdapter(this.adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -77,10 +103,12 @@ public class HotspotFragment extends Fragment {
                         wifiFailToast.setGravity(Gravity.CENTER, 0 ,0);
                         wifiSuccessToast.setGravity(Gravity.CENTER, 0 ,0);
                         if (isSuccess) {
+                            //callback.onConnected(true);
                             wifiSuccessToast.show();
                         }
                         else {
                             wifiFailToast.show();
+                            //callback.onConnected(false);
                         }
                     }
                 });
@@ -111,6 +139,19 @@ public class HotspotFragment extends Fragment {
          * has a blank SSID.                                           *
          * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
         class WifiReceiver extends BroadcastReceiver {
+
+            public boolean isSmartConnection(String ssid){
+                if (ssid.substring(0, 3).equals("swf")){
+                    String newSSID = ssid.substring(3);
+                    if (Patterns.IP_ADDRESS.matcher(newSSID).matches()) {
+                        return true;
+                    }
+                }
+                else {
+                    return false; }
+                    return false;
+            }
+
             public void onReceive(Context c, Intent intent) {
                 arrayList.clear();
                 adapter.notifyDataSetChanged();
@@ -119,17 +160,23 @@ public class HotspotFragment extends Fragment {
                     results = wifiManager.getScanResults();
                     if (results.size() > 0) {
                         for (ScanResult scanResult : results) {
-                            if(!scanResult.SSID.equals("")) {
-                                arrayList.add(scanResult.SSID);
-                                adapter.notifyDataSetChanged();
+                            if (!scanResult.SSID.equals("")) {
+                                //if (isSmartConnection(scanResult.SSID)) {
+                                    arrayList.add(scanResult.SSID);
+                                    adapter.notifyDataSetChanged();
+                                //}
                             }
                         }
-
-                    } else {
-                        Toast.makeText(getActivity(), "No Wifi found.", Toast.LENGTH_SHORT).show();
                     }
+
+                } else {
+                    Toast.makeText(getActivity(), "No Wifi found.", Toast.LENGTH_SHORT).show();
+
                 }
             }
+
         }
 
-}
+
+        }
+
