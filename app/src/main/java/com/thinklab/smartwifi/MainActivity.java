@@ -1,7 +1,9 @@
 package com.thinklab.smartwifi;
 
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
@@ -21,6 +23,24 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.Toolbar;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.web3j.crypto.Credentials;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.http.HttpService;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.security.Provider;
+import java.security.Security;
+import java.util.Collection;
+
+import java8.lang.Iterables;
+
+import static android.os.Environment.DIRECTORY_DOWNLOADS;
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
+
 
 public class MainActivity extends AppCompatActivity {
     final ConnectionFragment connectionFragment = new ConnectionFragment();
@@ -28,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     final SettingsFragment settings = new SettingsFragment();
     final HotspotFragment hotspot = new HotspotFragment();
     final FragmentManager fm = getSupportFragmentManager();
+    Web3j web3j;
     Fragment active = connectionFragment;
 
 
@@ -70,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         checkPermissions();
-
+        setupBouncyCastle();
 
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
@@ -85,7 +106,50 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1001);
         }
+
+        HttpService infuraHttpService = new HttpService("https://ropsten.infura.io/v3/cdc0f13f944348f9a395ad4887d1e859");
+        web3j = Web3j.build(infuraHttpService); //connect to infura with web3j
+        File f = new File(Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).getPath());
+        Wallet wallet = new Wallet();
+        Collection collection = getListOfAllConfigFiles(f);
+        if(collection.isEmpty()){
+            try {
+                String fileName = wallet.createWallet();
+                Log.d("Created wallet", " successfully");
+                SharedPreferences credentialsGlobal = getSharedPreferences("Credentials", MODE_PRIVATE);
+                SharedPreferences.Editor editor = credentialsGlobal.edit();
+                Log.d("Storing filename",  fileName);
+                editor.putString("Password", "password");
+                editor.putString("fileName", fileName);
+                editor.commit();
+            }catch (Exception e){
+                Log.d("Failed", " creating wallet");
+            }
+        }
+        else{
+            String fileName2 = collection.iterator().next().toString();
+            try {
+                Credentials credentials = wallet.loadCredentials("password" , fileName2);
+                SharedPreferences credentialsGlobal = getDefaultSharedPreferences(this);
+                SharedPreferences.Editor editor = credentialsGlobal.edit();
+                Log.d("Storing filename",  fileName2);
+                editor.putString("Password", "password");
+                editor.putString("fileName", fileName2);
+                editor.commit();
+
+            }catch (Exception e){
+                Log.d("Wrong ", "filename");
+            }
+
+
+        }
+
     }
+    Collection<String> getListOfAllConfigFiles(File directory)
+    {
+        return FileUtils.listFiles(directory, new WildcardFileFilter("*.json"), null);
+    }
+
 
     private void checkPermissions() {
         String TAG = "Permisiion";
@@ -109,6 +173,23 @@ public class MainActivity extends AppCompatActivity {
         } else { //permission is automatically granted on sdk<23 upon installation
             Log.v(TAG, "Permission is granted2");
         }
+    }
+    private void setupBouncyCastle() {
+        final Provider provider = Security.getProvider(BouncyCastleProvider.PROVIDER_NAME);
+        if (provider == null) {
+            // Web3j will set up the provider lazily when it's first used.
+            return;
+        }
+        if (provider.getClass().equals(BouncyCastleProvider.class)) {
+            // BC with same package name, shouldn't happen in real life.
+            return;
+        }
+        // Android registers its own BC provider. As it might be outdated and might not include
+        // all needed ciphers, we substitute it with a known BC bundled in the app.
+        // Android's BC has its package rewritten to "com.android.org.bouncycastle" and because
+        // of that it's possible to have another BC implementation loaded in VM.
+        Security.removeProvider(BouncyCastleProvider.PROVIDER_NAME);
+        Security.insertProviderAt(new BouncyCastleProvider(), 1);
     }
 
 

@@ -12,9 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.Provider;
 import java.security.Security;
+import java.util.concurrent.ExecutionException;
+
 import android.widget.Button;
 import android.widget.Toast;
 import org.web3j.crypto.Credentials;
@@ -64,20 +67,9 @@ public class AboutFragment extends Fragment {
                     @Override
                     public void run() {
                         try  {
-                            Credentials credentials = wallet.loadCredentials("password", "/storage/emulated/0/Download/UTC--2019-03-29T02-55-22.0Z--32a29c9040d3ae460849e2a19591253be80357a0.json");
-                            wallet.sendTransaction(web3j, credentials);
-                            ethGetBalance = web3j
-                                    .ethGetBalance("0x32a29c9040d3ae460849e2a19591253be80357a0",DefaultBlockParameterName.LATEST)
-                                    .sendAsync()
-                                    .get();
-                            BigInteger wei = ethGetBalance.getBalance();
-                            Log.d("Balance", wei.toString());
-                            ethGetBalance = web3j
-                                    .ethGetBalance("0xF88dF2c638ec22B422Ab519f07636a9e47f470df",DefaultBlockParameterName.LATEST)
-                                    .sendAsync()
-                                    .get();
-                            BigInteger wei2 = ethGetBalance.getBalance();
-                            Log.d("Balance contract", wei2.toString());
+                            Credentials credentials = wallet.loadCredentials("password", "/storage/emulated/0/Download/hey.json");
+                            wallet.sendTransaction(web3j, "0xc7722426fd46467ecDB7650345337EeCaAF9aeB9", "0xF88dF2c638ec22B422Ab519f07636a9e47f470df", credentials);
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

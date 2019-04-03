@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+    android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
     <TextView
         android:id="@+id/settingsMessage"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
@@ -13,7 +13,7 @@
 
     <TextView
         android:id="@+id/walletText"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/settingsMessage"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
@@ -25,97 +25,6 @@
         android:textSize="18sp"
         android:textStyle="bold" />
 
-    <EditText
-        android:id="@+id/editText"
-        android:layout_width="283dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/walletText"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="0dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:textSize="10sp"
-        android:textStyle="italic"
-        tools:text="Private key" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/editText"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="1dp"
-        android:text="Enter your private key and click save to store changes"
-        android:textSize="10sp"
-        android:textStyle="italic" />
-
-    <Button
-        android:id="@+id/button2"
-        style="@style/Widget.AppCompat.Button"
-        android:layout_width="62dp"
-        android:layout_height="30dp"
-        android:layout_below="@+id/walletText"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="11dp"
-        android:layout_toRightOf="@+id/editText"
-        android:text="Save"
-        android:textColor="@color/colorAccent"
-        android:textSize="8sp"
-        android:textStyle="bold" />
-    <TextView
-        android:id="@+id/walletText2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:text="Create wallet"
-        android:textAllCaps="false"
-        android:textColor="@color/colorPrimaryDark"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-    <TextView
-        android:id="@+id/createWalletInfo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/walletText2"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="1dp"
-        android:text="If you have not created a local wallet, click create"
-        android:textSize="10sp"
-        android:textStyle="italic" />
-
-    <Button
-        android:id="@+id/createButton"
-        style="@style/Widget.AppCompat.Button"
-        android:layout_width="62dp"
-        android:layout_height="30dp"
-        android:layout_below="@+id/walletText2"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="-13dp"
-        android:layout_toRightOf="@+id/editText"
-        android:text="Create"
-        android:textColor="@color/colorAccent"
-        android:textSize="8sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/walletSuccess"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/createWalletInfo"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:text="Your wallet has been successfully created."
-        android:textAllCaps="false"
-        android:textColor="@color/colorPrimary"
-        android:textSize="18sp"
-        android:textStyle="bold" />
     <TextView
         android:id="@+id/walletAddress"
         android:layout_width="wrap_content"
@@ -126,7 +35,18 @@
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:text="Wallet Address: "
         android:textAllCaps="false"
-        android:textSize="18sp"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+    <TextView
+        android:id="@+id/walletAddress2"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:text=""
+        android:textAllCaps="false"
+        android:textSize="13sp"
         android:textStyle="bold" />
     <TextView
         android:id="@+id/walletPrivateKey"
@@ -138,8 +58,21 @@
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:text="Wallet PrivateKey: "
         android:textAllCaps="false"
-        android:textSize="18sp"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/walletPrivateKey2"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_weight="1"
+        android:text=""
+        android:textAllCaps="false"
+        android:textSize="13sp"
         android:textStyle="bold" />
 
 
-</RelativeLayout>
+</LinearLayout>

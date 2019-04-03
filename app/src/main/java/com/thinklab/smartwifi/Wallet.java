@@ -2,16 +2,24 @@ package com.thinklab.smartwifi;
 import android.os.Environment;
 
 import org.web3j.crypto.Credentials;
+import org.web3j.crypto.RawTransaction;
+import org.web3j.crypto.TransactionEncoder;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.crypto.WalletUtils;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.tx.Transfer;
+import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 import org.web3j.utils.Convert;
+import org.web3j.utils.Numeric;
+
 import java.io.File;
-import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.concurrent.ExecutionException;
+
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
 
 public class Wallet {
+    public static final BigInteger GAS_PRICE_DEFAULT = BigInteger.valueOf(20_000_000_000L);
+    public static final BigInteger GAS_LIMIT_DEFAULT = BigInteger.valueOf(4_700_000L);
     // Create new wallet
     public String createWallet() throws Exception {
         String path = Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).getPath();
@@ -29,12 +37,27 @@ public class Wallet {
                 fileName);
         return credentials;
     }
-    public String sendTransaction(Web3j web3, Credentials credentials) throws Exception {
-        TransactionReceipt transferReceipt = Transfer.sendFunds(web3, credentials,
-                "0xF88dF2c638ec22B422Ab519f07636a9e47f470df",  // you can put any address here
-                BigDecimal.ONE, Convert.Unit.WEI)  // 1 wei = 10^-18 Ether
-                .send();
-        return transferReceipt.getTransactionHash();
+
+    public String sendTransaction(Web3j web3, String from, String contractAddress, Credentials credentials) throws Exception {
+        BigInteger amountWei = Convert.toWei("0.02", Convert.Unit.ETHER).toBigInteger();
+        EthGetTransactionCount ethGetTransactionCount = web3.ethGetTransactionCount(from, DefaultBlockParameterName.LATEST).sendAsync().get();
+        BigInteger nonce = getNonce(from, web3);
+
+
+        RawTransaction transaction = RawTransaction.createEtherTransaction(nonce, GAS_PRICE_DEFAULT, GAS_LIMIT_DEFAULT, contractAddress, amountWei);
+        byte[] signedMessage = TransactionEncoder.signMessage(transaction, credentials);
+        String hexValue = Numeric.toHexString(signedMessage);
+        org.web3j.protocol.core.methods.response.EthSendTransaction transactionResponse = web3.ethSendRawTransaction(hexValue).sendAsync().get();
+        String transactionHash = transactionResponse.getTransactionHash();
+
+        return transactionHash;
     }
+    private static BigInteger getNonce(String address, Web3j web3) throws InterruptedException, ExecutionException {
+        EthGetTransactionCount txCount = web3.ethGetTransactionCount(address, DefaultBlockParameterName.LATEST)
+                .sendAsync().get();
+        BigInteger nonce = txCount.getTransactionCount();
+        return nonce;
+    }
+
 }
 
