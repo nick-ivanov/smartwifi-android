@@ -1,5 +1,6 @@
 package com.thinklab.smartwifi;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -22,6 +24,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.widget.Toolbar;
+import android.support.v4.app.Fragment;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -35,6 +38,7 @@ import java.io.FilenameFilter;
 import java.security.Provider;
 import java.security.Security;
 import java.util.Collection;
+import java.util.Set;
 
 import java8.lang.Iterables;
 
@@ -106,49 +110,8 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1001);
         }
-
-        HttpService infuraHttpService = new HttpService("https://ropsten.infura.io/v3/cdc0f13f944348f9a395ad4887d1e859");
-        web3j = Web3j.build(infuraHttpService); //connect to infura with web3j
-        File f = new File(Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS).getPath());
-        Wallet wallet = new Wallet();
-        Collection collection = getListOfAllConfigFiles(f);
-        if(collection.isEmpty()){
-            try {
-                String fileName = wallet.createWallet();
-                Log.d("Created wallet", " successfully");
-                SharedPreferences credentialsGlobal = getSharedPreferences("Credentials", MODE_PRIVATE);
-                SharedPreferences.Editor editor = credentialsGlobal.edit();
-                Log.d("Storing filename",  fileName);
-                editor.putString("Password", "password");
-                editor.putString("fileName", fileName);
-                editor.commit();
-            }catch (Exception e){
-                Log.d("Failed", " creating wallet");
-            }
-        }
-        else{
-            String fileName2 = collection.iterator().next().toString();
-            try {
-                Credentials credentials = wallet.loadCredentials("password" , fileName2);
-                SharedPreferences credentialsGlobal = getDefaultSharedPreferences(this);
-                SharedPreferences.Editor editor = credentialsGlobal.edit();
-                Log.d("Storing filename",  fileName2);
-                editor.putString("Password", "password");
-                editor.putString("fileName", fileName2);
-                editor.commit();
-
-            }catch (Exception e){
-                Log.d("Wrong ", "filename");
-            }
-
-
-        }
-
     }
-    Collection<String> getListOfAllConfigFiles(File directory)
-    {
-        return FileUtils.listFiles(directory, new WildcardFileFilter("*.json"), null);
-    }
+
 
 
     private void checkPermissions() {
