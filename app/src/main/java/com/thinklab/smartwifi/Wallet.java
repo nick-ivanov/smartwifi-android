@@ -38,8 +38,8 @@ public class Wallet {
         return credentials;
     }
 
-    public String sendTransaction(Web3j web3, String from, String contractAddress, Credentials credentials) throws Exception {
-        BigInteger amountWei = Convert.toWei("0.02", Convert.Unit.ETHER).toBigInteger();
+    public String sendTransaction(Web3j web3, String from, String contractAddress, Credentials credentials, String ether) throws Exception {
+        BigInteger amountWei = Convert.toWei(ether, Convert.Unit.ETHER).toBigInteger();
         EthGetTransactionCount ethGetTransactionCount = web3.ethGetTransactionCount(from, DefaultBlockParameterName.LATEST).sendAsync().get();
         BigInteger nonce = getNonce(from, web3);
 

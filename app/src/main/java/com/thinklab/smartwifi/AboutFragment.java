@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,11 +96,25 @@ public class AboutFragment extends Fragment {
                             Looper.prepare();
                             if (Double.parseDouble(wei.toString()) < .03) {
                                 //Toast.makeText(getContext(), "Balance is too low", Toast.LENGTH_LONG);
+                                getActivity().runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        Toast success = Toast.makeText(getActivity(), "Balance too low", Toast.LENGTH_LONG);
+                                        success.setGravity(Gravity.CENTER, 0, 0);
+                                        success.show();
+                                    }
+                                });
                                 Log.d("Error", "Balance too low");
                             }
                             else {
                                 Credentials credentials = wallet.loadCredentials("password", "/storage/emulated/0/Download/hey.json");
-                                wallet.sendTransaction(web3j, "0xc7722426fd46467ecDB7650345337EeCaAF9aeB9", "0xF88dF2c638ec22B422Ab519f07636a9e47f470df", credentials);
+                                wallet.sendTransaction(web3j, "0xc7722426fd46467ecDB7650345337EeCaAF9aeB9", "0xF88dF2c638ec22B422Ab519f07636a9e47f470df", credentials, ".02");
+                                getActivity().runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        Toast fail = Toast.makeText(getActivity(), "Sending to contract..", Toast.LENGTH_LONG);
+                                        fail.setGravity(Gravity.CENTER, 0, 0);
+                                        fail.show();
+                                    }
+                                });
                             }
 
                         } catch (Exception e) {

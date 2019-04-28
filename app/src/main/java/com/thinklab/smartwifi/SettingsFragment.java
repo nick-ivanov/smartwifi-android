@@ -92,6 +92,10 @@ public class SettingsFragment extends Fragment {
             Log.d("hey, ", e.toString());
         }
     }
+    public String getWalletAddress(){
+        return this.walletAddress.getText().toString();
+    }
+
 
 
 

@@ -112,6 +112,13 @@ public class HotspotFragment extends Fragment {
                                     f.setConnectedStatus(true);//we are connected
                                     f.showDisconnect(true);
                                     wifiSuccessToast.show();
+                                    SWFClient swfClient = new SWFClient();
+                                    try {
+                                        swfClient.run2();
+                                    }catch (Exception ex){
+                                        ex.printStackTrace();
+                                        Log.d("Error with SWFclient", "");
+                                    }
 
                                 } else {
                                     wifiFailToast.show();
