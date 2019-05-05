@@ -20,6 +20,13 @@ import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.utils.Numeric;
 
+import android.content.Context;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
+
+import com.kenai.jffi.Main;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.InputStreamReader;
@@ -172,6 +179,7 @@ public class SWFHelper {
 
     // Couresy: https://stackoverflow.com/a/8263301/8041645
     static long getTimestamp() {
+        Log.d("Calling ", "Get time stamp");
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         calendar.clear();
         calendar.setTime(new Date());
@@ -502,6 +510,7 @@ public class SWFHelper {
             return null;
         }
 
+
     }
 
     static String getSmallPage(String address) {
@@ -511,9 +520,13 @@ public class SWFHelper {
             ex.printStackTrace();
             return null;
         }
+
+    }
+    static void dupsetProbe1(){
+
     }
 
-    static void dupsetProbe() {
+    static void dupsetProbe(Context context) {
 
         final int buf_len = 1024 * 1024;
         final int small_buf_len = 1024;
@@ -522,6 +535,7 @@ public class SWFHelper {
 
         ArrayList<String> sites = new ArrayList<>();
 
+        Log.d("Adding sites", "");
 
         sites.add("157.230.151.37");
         sites.add("178.62.109.110");
@@ -635,13 +649,14 @@ public class SWFHelper {
 
 
                 long tdelta = (time2 - time1) - (time4 - time3);
-
+                Log.d("Line", "648");
                 double speed;
                 if(tdelta <= 0) {
                     speed = 0.0;
                 } else {
                     speed = (double) ( (delta * 8.0) / (tdelta / 1000.0));
                 }
+                Log.d("Line", "655");
 
                 //printf("Site #%d (%s) payload delta (bytes): %d, delay delta (ms): %ld, speed (bps): %f, latency component (ms): %ld\n", (i+1), sites[i], delta, tdelta, speed, time4-time3);
 
@@ -666,10 +681,11 @@ public class SWFHelper {
 
             res_maxspeed = speedmax/1000000.0;
             speeds[k] = res_maxspeed;
-
+            Log.d("Line", "680");
             res_delay = time5 - time0;
             res_payload = pload_sum;
             res_avg_latency = sum_latency / num_sites;
+            Log.d("Line", "684");
 
             lspeeds[k] = res_avg_latency;
 
@@ -681,9 +697,10 @@ public class SWFHelper {
                 lsma_sum += lspeeds[z];
                 //printf("adding %f to SMA2\n", speeds[z]);
             }
+            Log.d("Line", "696");
             sma2 = sma_sum/y;
             lsma2 = lsma_sum/y;
-
+            Log.d("Line", "699");
             sma_sum = 0.0;
             lsma_sum = 0.0;
             y = 0.0;
@@ -692,9 +709,10 @@ public class SWFHelper {
                 lsma_sum += lspeeds[z];
                 //printf("adding %f to SMA3\n", speeds[z]);
             }
+            Log.d("Line", "708");
             sma3 = sma_sum/y;
             lsma3 = lsma_sum/y;
-
+            Log.d("Line", "711");
 
             sma_sum = 0.0;
             lsma_sum = 0.0;
@@ -704,9 +722,10 @@ public class SWFHelper {
                 lsma_sum += lspeeds[z];
                 //printf("adding %f to SMA4\n", speeds[z]);
             }
+            Log.d("Line", "721");
             sma4 = sma_sum/y;
             lsma4 = lsma_sum/y;
-
+            Log.d("Line", "724");
             sma_sum = 0.0;
             lsma_sum = 0.0;
             y = 0.0;
@@ -715,9 +734,10 @@ public class SWFHelper {
                 lsma_sum += lspeeds[z];
                 //printf("adding %f to SMA5\n", speeds[z]);
             }
+            Log.d("Line", "733");
             sma5 = sma_sum/y;
             lsma5 = lsma_sum/y;
-
+            Log.d("Line", "736");
 
             sma_sum = 0.0;
             lsma_sum = 0.0;
@@ -727,10 +747,10 @@ public class SWFHelper {
                 lsma_sum += lspeeds[z];
                 //printf("adding %f to SMA6\n", speeds[z]);
             }
+            Log.d("Line", "746");
             sma6 = sma_sum/y;
             lsma6 = lsma_sum/y;
-
-
+            Log.d("Line", "749");
             sma_sum = 0.0;
 
             //printf("k = %d\n", k);
@@ -740,9 +760,9 @@ public class SWFHelper {
                 //printf("adding %f to SMA6\n", speeds[z]);
             }
             //printf("\n");
-
+            Log.d("Line", "759");
             tcma = sma_sum/(k+1);
-
+            Log.d("Line", "761");
 
             // MAXSPEED, DELAY, PAYLOAD, AVG_LATENCY,SMA2,SMA3,SMA4,SMA5,SMA6,LSMA2,LSMA3,LSMA4,LSMA5,LSMA6
 
@@ -755,6 +775,7 @@ public class SWFHelper {
             // free(rand_websites);
             // free(rand_indices);
 
+
             speed = tcma;
 
             System.out.println("SPEED_REPORT: " + tcma);
@@ -762,9 +783,9 @@ public class SWFHelper {
         }
     }
 
-    static void startDupset() {
+    static void startDupset(Context context) {
         Runnable task = () -> {
-            dupsetProbe();
+            dupsetProbe(context);
         };
 
         Thread worker = new Thread(task);
@@ -811,6 +832,10 @@ public class SWFHelper {
 //        } catch (Exception ex) {
 //            ex.printStackTrace();
 //        }
+
+    public static double getSpeed() {
+        return speed;
+    }
 //
 //        return 1;
 //

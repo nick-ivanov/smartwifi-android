@@ -82,61 +82,68 @@ public class HotspotFragment extends Fragment {
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                        final AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(getActivity());
-                        final String ssid = listView.getItemAtPosition(position).toString();
-                        final EditText input = new EditText(getActivity());
+                        if(SettingsFragment.addr != null) {
+                            final AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(getActivity());
+                            final String ssid = listView.getItemAtPosition(position).toString();
+                            final EditText input = new EditText(getActivity());
 
-                        myAlertDialog.setTitle(listView.getItemAtPosition(position).toString());
-                        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                            myAlertDialog.setTitle(listView.getItemAtPosition(position).toString());
+                            input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 
-                        myAlertDialog.setView(input);
-                        myAlertDialog.setMessage("Please enter the password");
+                            myAlertDialog.setView(input);
+                            myAlertDialog.setMessage("Please enter the password");
 
-                        myAlertDialog.setPositiveButton("Connect", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                WifiUtils.withContext(getContext()) //Attempt to connect
-                                        .connectWith(ssid, input.getText().toString())
-                                        .onConnectionResult(this::checkResult)
-                                        .start(); //Credit to https://github.com/ThanosFisherman/WifiUtils for this library
-                            }
-
-                            private void checkResult(boolean isSuccess) { //Credit to https://github.com/ThanosFisherman/WifiUtils for checkResult function, found in his example
-                                Toast wifiSuccessToast = Toast.makeText(getActivity(), "Successfully connected", Toast.LENGTH_SHORT);
-                                Toast wifiFailToast = Toast.makeText(getActivity(), "Failed to connect", Toast.LENGTH_LONG);
-                                wifiFailToast.setGravity(Gravity.CENTER, 0, 0);
-                                wifiSuccessToast.setGravity(Gravity.CENTER, 0, 0);
-                                if (isSuccess) {
-                                    ConnectionFragment f = (ConnectionFragment) getFragmentManager().findFragmentByTag("connection");
-                                    f.setIpAddress(true, getIpAddr());
-                                    f.setConnectionClock(true);
-                                    f.setConnectedStatus(true);//we are connected
-                                    f.showDisconnect(true);
-                                    wifiSuccessToast.show();
-                                    SWFClient swfClient = new SWFClient();
-                                    try {
-                                        swfClient.run2();
-                                    }catch (Exception ex){
-                                        ex.printStackTrace();
-                                        Log.d("Error with SWFclient", "");
-                                    }
-
-                                } else {
-                                    wifiFailToast.show();
-                                    ConnectionFragment f = (ConnectionFragment) getFragmentManager().findFragmentByTag("connection");
-                                    f.setConnectedStatus(false);
-                                    f.setIpAddress(false, "");
-                                    f.setConnectionClock(false);
-                                    f.showDisconnect(false);
+                            myAlertDialog.setPositiveButton("Connect", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    WifiUtils.withContext(getContext()) //Attempt to connect
+                                            .connectWith(ssid, input.getText().toString())
+                                            .onConnectionResult(this::checkResult)
+                                            .start(); //Credit to https://github.com/ThanosFisherman/WifiUtils for this library
                                 }
-                            }
-                        });
-                        myAlertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                return;
-                            }
-                        });
-                        myAlertDialog.show();
 
+                                private void checkResult(boolean isSuccess) { //Credit to https://github.com/ThanosFisherman/WifiUtils for checkResult function, found in his example
+                                    Toast wifiSuccessToast = Toast.makeText(getActivity(), "Successfully connected", Toast.LENGTH_SHORT);
+                                    Toast wifiFailToast = Toast.makeText(getActivity(), "Failed to connect", Toast.LENGTH_LONG);
+                                    wifiFailToast.setGravity(Gravity.CENTER, 0, 0);
+                                    wifiSuccessToast.setGravity(Gravity.CENTER, 0, 0);
+                                    if (isSuccess) {
+                                        ConnectionFragment f = (ConnectionFragment) getFragmentManager().findFragmentByTag("connection");
+                                        String tempIp = ssid.substring(3);
+                                        f.setIpAddress(true, tempIp);
+                                        //f.setConnectionClock(true);
+                                        f.setConnectedStatus(true);//we are connected
+                                        f.setSSID(ssid);
+                                        f.showDisconnect(true);
+                                        wifiSuccessToast.show();
+                                        SWFClient swfClient = new SWFClient();
+                                        try {
+                                            f.run2();
+                                        } catch (Exception ex) {
+                                            ex.printStackTrace();
+                                            Log.d("Error with SWFclient", "");
+                                        }
+
+                                    } else {
+                                        wifiFailToast.show();
+                                        ConnectionFragment f = (ConnectionFragment) getFragmentManager().findFragmentByTag("connection");
+                                        f.setConnectedStatus(false);
+                                        f.setIpAddress(false, "");
+                                        f.setConnectionClock(false);
+                                        f.showDisconnect(false);
+                                    }
+                                }
+                            });
+                            myAlertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    return;
+                                }
+                            });
+                            myAlertDialog.show();
+                        } else{
+                            Toast privateKeyError = Toast.makeText(getActivity(), "Go to settings to enter private key", Toast.LENGTH_SHORT);
+                            privateKeyError.setGravity(Gravity.CENTER, 0, 0);
+                            privateKeyError.show();
+                        }
                     }
 
                 });
@@ -192,6 +199,7 @@ public class HotspotFragment extends Fragment {
                     return false;
             }
 
+
             @Override
             public void onReceive(Context c, Intent intent) {
                 arrayList.clear();
@@ -220,6 +228,20 @@ public class HotspotFragment extends Fragment {
 
 
         }
+
+    @Override
+    public void onDestroy() {
+
+        try{
+            if(wifiReceiver!=null)
+                getActivity().unregisterReceiver(wifiReceiver);
+
+        }catch(Exception e){}
+
+        super.onDestroy();
+    }
+
+
 
 
         }

@@ -3,7 +3,7 @@
 <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:columnCount="3">
 
 
@@ -57,8 +57,8 @@
 
     <TextView
         android:layout_margin="3dp"
-        android:id="@+id/message12"
-        android:text="Active"
+        android:id="@+id/messageActive"
+        android:text=""
         android:textColor="#43A047"
         />
 
@@ -114,7 +114,7 @@
     <TextView
         android:layout_margin="3dp"
         android:id="@+id/message32"
-        android:text="25.29 Mbps"
+        android:text=""
         />
 
 
@@ -276,10 +276,10 @@
         />
 
     <TextView
-        android:layout_margin="3dp"
         android:id="@+id/message92"
-        android:text="0xe57EB9...7d402E"
-        />
+        android:layout_width="122dp"
+        android:layout_margin="3dp"
+        android:text="" />
 
     <!-- Blockchain Network -->
     <ImageView
@@ -329,10 +329,10 @@
         />
 
     <TextView
-        android:layout_margin="3dp"
         android:id="@+id/message112"
-        android:text="0x5B356D...9C59c0"
-        />
+        android:layout_width="138dp"
+        android:layout_margin="3dp"
+        android:text="0x5B356D...9C59c0" />
 
     <!-- Smart Contract Status -->
     <ImageView

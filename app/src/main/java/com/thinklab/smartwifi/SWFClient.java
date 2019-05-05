@@ -1,4 +1,8 @@
 package com.thinklab.smartwifi;
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 
@@ -19,38 +23,46 @@ import java.util.Set;
 
 public class SWFClient {
 
-    public static void run2() throws Exception {
+    public static void run2(Activity activity) throws Exception {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     Log.d("started main", "Started main");
                     //SWFLogger.separator("hashchain");
-                    Log.d(SWFHelper.getFullHashChain("hello", 10).toString(), "");
+                    //Log.d(SWFHelper.getFullHashChain("hello", 10).toString(), "");
                     //System.out.println(SWFHelper.getFullHashChain("hello", 10));
 
                     ClientSecret secret = SWFHelper.generateClientSecret();
 
                     //SWFLogger.log("hashchain", "secret class object", secret.toString());
 
-                    Log.d(secret.toString(), "");
-                    String walletfile = "/storage/emulated/0/Download/UTC--2017-10-20T19-02-52.7Z--c89fd8f8550efeef20a9fd53338a1f0f3a57c0a1.json";       //NEED TO REPLACE
-                    String walletpassword = "password";
-                    Credentials credentials = WalletUtils.loadCredentials(walletpassword, walletfile);
+                    //Log.d(secret.toString(), "");
+                    //String walletfile = "/storage/emulated/0/Download/UTC--2017-10-20T19-02-52.7Z--c89fd8f8550efeef20a9fd53338a1f0f3a57c0a1.json";       //NEED TO REPLACE
+                    //String walletpassword = "password";
+                    //Credentials credentials = WalletUtils.loadCredentials(walletpassword, walletfile);
 
+
+
+
+                    SettingsFragment settingsFragment = new SettingsFragment();
+                    String privateKey = settingsFragment.getWalletPrivate();
+                    String wallet_public = settingsFragment.getWalletAddress();
+                    Log.d(privateKey, "Private key success");
+                    Credentials credentials = settingsFragment.getCredentials();
+                    //Log.d("Credentials", credentials.toString());
                     //System.out.println("CREDENTIALS: " + credentials.toString());
-
+                    Log.d("Got Credentials", "Got Credentials");
                     String port = "5566";
                     String server_host = "10.42.0.1";
-
+                    Log.d("Attempting Socket", "now");
                     // [[ SEND: TRANSMISSION #0 ]]
                     try (Socket socket = new Socket(server_host, Integer.parseInt(port))) {
                         Scanner in = new Scanner(socket.getInputStream());
                         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
                         //NEED TO REPLACE
-                        String wallet_public = "0xc89fD8f8550eFeef20a9fd53338a1f03Fa57c0a1";
-
+                        Log.d("public", wallet_public);
                         // [[ RECEIVE: TRANSMISSION #1 ]]
                         System.out.println(in.nextLine());
                         //Log.d(in.nextLine(), "Transmission 1");
@@ -64,7 +76,7 @@ public class SWFClient {
                         String[] aaa = reply.split(":");
 
                         System.out.println("REPLY: " + Arrays.asList(aaa));
-                        Log.d("REPLY: " + Arrays.asList(aaa), "Recieved");
+                        //Log.d("REPLY: " + Arrays.asList(aaa), "Recieved");
                         String infura_api_key = "ef1ce1202d8248a69d1eacd3a6237f28"; //Might need to replace!
 
                         Web3j web3 = Web3j.build(new HttpService("https://ropsten.infura.io/v3/" + infura_api_key));  // defaults to http://localhost:8545/
@@ -97,7 +109,7 @@ public class SWFClient {
 
                         // [[ SEND: TRANSMISSION #4 ]]
                         out.println("OK");
-                        Log.d("OK", "");
+                        //Log.d("OK", "");
 
 
                         // MESSAROUND
@@ -309,10 +321,18 @@ public class SWFClient {
 
                         // END OF MESSAROUND 2
 
-
                         try {
                             // [[ RECEIVE: TRANSMISSION #5 ]]
                             reply = in.nextLine();
+                            if(reply.equals("GO")){
+                               activity.runOnUiThread (new Thread(new Runnable() {
+                                   @Override
+                                   public void run() {
+                                       ConnectionFragment.C1.setConnectionClock(true);
+                                   }
+                            }));
+                            }
+
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
@@ -322,7 +342,7 @@ public class SWFClient {
 
                         if (!reply.equals("GO")) {
                             System.out.println("Nogo");
-                            Log.d("Nogo", "");
+                            //Log.d("Nogo", "");
                             out.println("bye");
                             socket.close();
                             return;
@@ -333,7 +353,7 @@ public class SWFClient {
 
 
                         System.out.println("Start loop");
-                        Log.d("Start loop", "");
+                        //Log.d("Start loop", "");
 
                         int chainsize = 60;
                         int subperiod_msec = 60000;
@@ -341,7 +361,8 @@ public class SWFClient {
                         ArrayList<String> fullHashChain = SWFHelper.getFullHashChain(secret.getSeed(), 60);
                         Collections.reverse(fullHashChain);
 
-                        SWFHelper.startDupset();
+
+                        ConnectionFragment.startDupset();
 
                         SWFHelper.nbSleep(10000);
 
@@ -356,7 +377,7 @@ public class SWFClient {
                                 break;
                             }
 
-                            if (SWFHelper.speed >= speed_min || i < testdrive_periods) {
+                            if (ConnectionFragment.getSpeed() >= speed_min || i < testdrive_periods) {
                                 out.println("ack:" + fullHashChain.get(count));
                                 count++;
                             } else {
@@ -395,7 +416,7 @@ public class SWFClient {
                     }
 
                 }catch(Exception e){
-
+                    Log.d("Error : ",e.getMessage());
                 }
             }
         });
