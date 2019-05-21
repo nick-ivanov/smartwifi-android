@@ -68,12 +68,7 @@
         android:layout_marginLeft="16dp"
         android:hint="Private Key" />
 
-    <Button
-        android:id="@+id/saveBttn"
-        android:layout_width="wrap_content"
-        android:layout_height="35dp"
-        android:layout_marginLeft="90dp"
-        android:text="Save" />
+
 
     <TextView
         android:id="@+id/walletPrivateKey2"
@@ -88,5 +83,48 @@
         android:textSize="13sp"
         android:textStyle="bold" />
 
+    <Button
+        android:id="@+id/saveBttn"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_marginLeft="90dp"
+        android:text="Save" />
+
+
+    <TextView
+        android:id="@+id/seekBarLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/walletAddress"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:text="Minimum Expected Internet Speed:"
+        android:textAllCaps="false"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        style="@style/Widget.AppCompat.SeekBar.Discrete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="4"
+        android:progress="2" />
+
+
+    <TextView
+        android:id="@+id/seekBarLabelPost"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/walletAddress"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:text="Medium (2 Mbps)"
+        android:textAllCaps="false"
+        android:textSize="14sp"
+        android:textStyle="normal" />
 
 </LinearLayout>

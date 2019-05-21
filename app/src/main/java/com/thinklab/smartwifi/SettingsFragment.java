@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.content.Context;
@@ -38,6 +39,7 @@ public class SettingsFragment extends Fragment {
     private EditText privateInput;
     private TextView walletPrivate;
     private Button saveBttn;
+    private SeekBar seekBar;
 
     //public Credentials credentials;
     //Wallet wallet = new Wallet();
@@ -54,6 +56,7 @@ public class SettingsFragment extends Fragment {
         walletPrivate = (TextView) view.findViewById(R.id.walletPrivateKey2);
         privateInput = (EditText) view.findViewById(R.id.PrivateInput);
         saveBttn = (Button) view.findViewById(R.id.saveBttn);
+        seekBar = (SeekBar) view.findViewById(R.id.seekBar);
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         String privateCheck = preferences.getString("Private", "None");
