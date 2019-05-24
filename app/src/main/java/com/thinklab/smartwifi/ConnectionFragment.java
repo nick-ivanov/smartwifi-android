@@ -77,8 +77,10 @@ public class ConnectionFragment extends Fragment {
     private static volatile boolean thread2 = true;
     private static Thread thread;
     private static Thread worker;
-    private static double speed_min = 2.0;
+    private static volatile double speed_min;
     private static Socket socket;
+    private static String infura_api_key;
+            //"ef1ce1202d8248a69d1eacd3a6237f28"; //Might need to replace!
 
 
     @Nullable
@@ -105,7 +107,6 @@ public class ConnectionFragment extends Fragment {
         setRetainInstance(true);
         connectionBool.setText("Dissconnected");
         button1.setVisibility(View.GONE);
-        connectionSpeed.setText("Calculating");
         connectionSpeed.setTextColor(Color.GREEN);
         totalCharge.setText("0.000 ETH");
         smartContractAddress.setText("");
@@ -132,10 +133,7 @@ public class ConnectionFragment extends Fragment {
                 }catch (Exception e){
                     e.printStackTrace();
                 }
-
-                //WifiManager wifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                //wifiManager.setWifiEnabled(false);
-
+                connectionSpeed.setText("N/A");
 
 
             }
@@ -156,6 +154,9 @@ public class ConnectionFragment extends Fragment {
             connectionBool.setTextColor(Color.BLACK);
         }
     }
+    public static void setInfuraInfo(String infuraInfo){
+        infura_api_key = infuraInfo;
+    }
 
 
     public static void setSpeed(Double speedTmp){
@@ -166,6 +167,7 @@ public class ConnectionFragment extends Fragment {
 
     public static void setSpeed_min(Double speed_min2){
         speed_min = speed_min2;
+        Log.d("speed was changed", "speed was changed");
     }
 
     public void showDisconnect(boolean show){
@@ -191,22 +193,7 @@ public class ConnectionFragment extends Fragment {
         }
     }
 
-//    Runnable updater;
-//
-//    void updateTime(final String timeString) {
-//        final Handler handler=new Handler();
-//        updater = new Runnable() {
-//            @Override
-//            public void run() {
-//                long elapsedMillis = SystemClock.elapsedRealtime() - simpleChronometer.getBase();dfops;jn
-//                //Log.d("elappsed time", valueOf(elapsedMillis));
-//                String charge = timeString + valueOf(0.0012);
-//                totalCharge.setText(charge + "ETH");
-//                timerHandler.postDelayed(updater,600);
-//            }
-//        };
-//        timerHandler.post(updater);
-//    }
+
     public void setConnectionClock(boolean connected) {
 
         if(connected){
@@ -272,13 +259,8 @@ public class ConnectionFragment extends Fragment {
             }
 
             byte[] byte_hash = Numeric.hexStringToByteArray(hash.replaceAll("0x", ""));
-            String res = com.thinklab.smartwifi.SWFHelper.getHashChainFromBytes(byte_hash, n);
+            String res = getHashChainFromBytes(byte_hash, n);
 
-//        System.out.println("n: " + n);
-//        System.out.println("verifyHash: top: " + top);
-//        System.out.println("verifyHash: res: " + res);
-//        System.out.println("verifyHash: hash: " + hash);
-//        System.out.println("checking whether " + res + " == " + top);
 
 
             if(res.equals(top)) {
@@ -448,7 +430,6 @@ public class ConnectionFragment extends Fragment {
             List<TypeReference<?>> outputParameters = new ArrayList<>();
 
 
-            //outputParameters.add(new TypeReference<Utf8String>() {});
 
             Function function = new Function("pay",
                     inputParameters,
@@ -494,17 +475,7 @@ public class ConnectionFragment extends Fragment {
                 timeout--;
             }
 
-//        System.out.println("Transaction hash: " + rawTrasactionResponse.getTransactionHash());
-//        System.out.println("tr.toString(): " + rawTrasactionResponse.toString());
-//        System.out.println("tr.getJsonrpc(): " + rawTrasactionResponse.getJsonrpc());
-//        System.out.println("tr.getRawResponse(): " + rawTrasactionResponse.getRawResponse());
-//        System.out.println("tr.getResult(): " + rawTrasactionResponse.getResult());
-//        System.out.println("tr.hasError(): " + rawTrasactionResponse.hasError());
-//
-//        if(rawTrasactionResponse.hasError()) {
-//            System.out.println("tr.error: " + rawTrasactionResponse.getError());
-//            System.out.println("tr.error: " + rawTrasactionResponse.getError().getMessage());
-//        }
+
 
             return rawTrasactionResponse.getTransactionHash();
         }
@@ -516,8 +487,6 @@ public class ConnectionFragment extends Fragment {
 
             List<TypeReference<?>> outputParameters = new ArrayList<>();
 
-
-            //outputParameters.add(new TypeReference<Utf8String>() {});
 
             Function function = new Function("refund",
                     inputParameters,
@@ -563,17 +532,6 @@ public class ConnectionFragment extends Fragment {
                 timeout--;
             }
 
-//        System.out.println("Transaction hash: " + rawTrasactionResponse.getTransactionHash());
-//        System.out.println("tr.toString(): " + rawTrasactionResponse.toString());
-//        System.out.println("tr.getJsonrpc(): " + rawTrasactionResponse.getJsonrpc());
-//        System.out.println("tr.getRawResponse(): " + rawTrasactionResponse.getRawResponse());
-//        System.out.println("tr.getResult(): " + rawTrasactionResponse.getResult());
-//        System.out.println("tr.hasError(): " + rawTrasactionResponse.hasError());
-//
-//        if(rawTrasactionResponse.hasError()) {
-//            System.out.println("tr.error: " + rawTrasactionResponse.getError());
-//            System.out.println("tr.error: " + rawTrasactionResponse.getError().getMessage());
-//        }
 
             return rawTrasactionResponse.getTransactionHash();
         }
@@ -694,7 +652,7 @@ public class ConnectionFragment extends Fragment {
 
             ArrayList<String> sites = new ArrayList<>();
 
-            Log.d("Adding sites", "");
+            Log.d("Adding sites", "sdfsd");
 
             sites.add("157.230.151.37");
             sites.add("178.62.109.110");
@@ -708,21 +666,9 @@ public class ConnectionFragment extends Fragment {
             sites.add("68.183.236.197");
 
             String buf;
-
-//        char * buf = (char *) malloc (BUF_LEN);
-//        if (buf == NULL) {
-//            fprintf (stderr, "malloc() error\n");
-//            return 1;
-//        }
-
-
             String buf_small;
 
-//        char * buf_small = (char *) malloc (SMALL_BUF_LEN);
-//        if (buf_small == NULL) {
-//            fprintf (stderr, "malloc() error\n");
-//            return 1;
-//        }
+
 
             double res_maxspeed;
             long res_delay;
@@ -732,16 +678,14 @@ public class ConnectionFragment extends Fragment {
             double lsma2, lsma3, lsma4, lsma5, lsma6;
             double tcma;
 
-            //double speeds[60];
-            //double lspeeds[60];
 
             double[] speeds = new double[60];
             double[] lspeeds = new double[60];
 
 
-
-            for(int k = 0; k < 120 && !dupset_flag; k++) {
-
+            Log.d("flag", valueOf(dupset_flag));
+            for(int k = 0; k < 120 && dupset_flag; k++) {
+                Log.d("Entered loop ", valueOf(dupset_flag));
                 sma2 = 0.0;
                 sma3 = 0.0;
                 sma4 = 0.0;
@@ -760,9 +704,6 @@ public class ConnectionFragment extends Fragment {
 
                 double speedsum = 0.0;
 
-                //printf("Number of sites: %d\n", NUM_SITES);
-
-                //char* data;
 
                 String data;
 
@@ -790,9 +731,6 @@ public class ConnectionFragment extends Fragment {
                         delta = buf.length();
                     }
 
-                    //printf("ORIG. DELTA: %d\n", delta);
-
-                    //sleep(2);
 
                     time3 = getTimestampMillis();
 
@@ -802,22 +740,17 @@ public class ConnectionFragment extends Fragment {
                     if(buf_small == null) delta = 0.0;
                     else delta -= buf_small.length();
 
-                    //printf("ADJ. DELTA: %d\n", delta);
 
                     pload_sum += delta;
 
 
                     long tdelta = (time2 - time1) - (time4 - time3);
-                    Log.d("Line", "648");
                     double speed;
                     if(tdelta <= 0) {
                         speed = 0.0;
                     } else {
                         speed = (double) ( (delta * 8.0) / (tdelta / 1000.0));
                     }
-                    Log.d("Line", "655");
-
-                    //printf("Site #%d (%s) payload delta (bytes): %d, delay delta (ms): %ld, speed (bps): %f, latency component (ms): %ld\n", (i+1), sites[i], delta, tdelta, speed, time4-time3);
 
                     sum_latency += (time4 - time3);
 
@@ -830,21 +763,12 @@ public class ConnectionFragment extends Fragment {
 
                 time5 = getTimestampMillis();
 
-                //double speedavg = (double) (speedsum / (double) nsites);
-                //printf("AVERAGE SPEED (bps): %f\n", speedavg);
-
-                //printf("MAXIMUM SPEED (mbps): %f\n", speedmax/1000000.0);
-
-                //printf("SPEED MEASUREMENT DELAY (msec): %ld\n", time5 - time0);
-                //printf("TOTAL PAYLOAD SIZE (bytes): %ld\n", pload_sum);
 
                 res_maxspeed = speedmax/1000000.0;
                 speeds[k] = res_maxspeed;
-                Log.d("Line", "680");
                 res_delay = time5 - time0;
                 res_payload = pload_sum;
                 res_avg_latency = sum_latency / num_sites;
-                Log.d("Line", "684");
 
                 lspeeds[k] = res_avg_latency;
 
@@ -854,24 +778,18 @@ public class ConnectionFragment extends Fragment {
                 for(int z = k; z >= 0 && y < 2; z--, y++) {
                     sma_sum += speeds[z];
                     lsma_sum += lspeeds[z];
-                    //printf("adding %f to SMA2\n", speeds[z]);
                 }
-                Log.d("Line", "696");
                 sma2 = sma_sum/y;
                 lsma2 = lsma_sum/y;
-                Log.d("Line", "699");
                 sma_sum = 0.0;
                 lsma_sum = 0.0;
                 y = 0.0;
                 for(int z = k; z >= 0 && y < 3; z--, y++) {
                     sma_sum += speeds[z];
                     lsma_sum += lspeeds[z];
-                    //printf("adding %f to SMA3\n", speeds[z]);
                 }
-                Log.d("Line", "708");
                 sma3 = sma_sum/y;
                 lsma3 = lsma_sum/y;
-                Log.d("Line", "711");
 
                 sma_sum = 0.0;
                 lsma_sum = 0.0;
@@ -879,24 +797,18 @@ public class ConnectionFragment extends Fragment {
                 for(int z = k; z >= 0 && y < 4; z--, y++) {
                     sma_sum += speeds[z];
                     lsma_sum += lspeeds[z];
-                    //printf("adding %f to SMA4\n", speeds[z]);
                 }
-                Log.d("Line", "721");
                 sma4 = sma_sum/y;
                 lsma4 = lsma_sum/y;
-                Log.d("Line", "724");
                 sma_sum = 0.0;
                 lsma_sum = 0.0;
                 y = 0.0;
                 for(int z = k; z >= 0 && y < 5; z--, y++) {
                     sma_sum += speeds[z];
                     lsma_sum += lspeeds[z];
-                    //printf("adding %f to SMA5\n", speeds[z]);
                 }
-                Log.d("Line", "733");
                 sma5 = sma_sum/y;
                 lsma5 = lsma_sum/y;
-                Log.d("Line", "736");
 
                 sma_sum = 0.0;
                 lsma_sum = 0.0;
@@ -904,26 +816,18 @@ public class ConnectionFragment extends Fragment {
                 for(int z = k; z >= 0 && y < 6; z--, y++) {
                     sma_sum += speeds[z];
                     lsma_sum += lspeeds[z];
-                    //printf("adding %f to SMA6\n", speeds[z]);
                 }
-                Log.d("Line", "746");
                 sma6 = sma_sum/y;
                 lsma6 = lsma_sum/y;
-                Log.d("Line", "749");
                 sma_sum = 0.0;
 
-                //printf("k = %d\n", k);
                 for(int z = k; z >= 0; z--) {
                     sma_sum += speeds[z];
-                    //printf(".");
-                    //printf("adding %f to SMA6\n", speeds[z]);
                 }
-                //printf("\n");
-                Log.d("Line", "759");
                 tcma = sma_sum/(k+1);
-                Log.d("Line", "761");
 
                 speed = tcma;
+                Log.d("attempting", "attempting to display speed");
 
                 try {
                     mInstance.runOnUiThread(new Runnable() {
@@ -941,13 +845,14 @@ public class ConnectionFragment extends Fragment {
                 }
 
                 System.out.println("SPEED_REPORT: " + tcma);
+                Log.d("speed report", valueOf(speed));
 
-                // SWFHelper.nbSleep(1000);
             }
         }
 
         public static void startDupset() {
             Runnable task = () -> {
+                Log.d("running depsetProbe", "running");
                 dupsetProbe();
             };
 
@@ -960,11 +865,6 @@ public class ConnectionFragment extends Fragment {
             return speed;
         }
 
-//
-//        return 1;
-//
-//
-//    }
 
 
     public static void run2() throws Exception {
@@ -972,34 +872,14 @@ public class ConnectionFragment extends Fragment {
             @Override
             public void run() {
                 try {
-                    Log.d("started main", "Started main");
-                    //SWFLogger.separator("hashchain");
-                    //Log.d(SWFHelper.getFullHashChain("hello", 10).toString(), "");
-                    //System.out.println(SWFHelper.getFullHashChain("hello", 10));
 
                     ClientSecret secret = generateClientSecret();
-
-                    //SWFLogger.log("hashchain", "secret class object", secret.toString());
-
-                    //Log.d(secret.toString(), "");
-                    //String walletfile = "/storage/emulated/0/Download/UTC--2017-10-20T19-02-52.7Z--c89fd8f8550efeef20a9fd53338a1f0f3a57c0a1.json";       //NEED TO REPLACE
-                    //String walletpassword = "password";
-                    //Credentials credentials = WalletUtils.loadCredentials(walletpassword, walletfile);
-
-
-
-
                     SettingsFragment settingsFragment = new SettingsFragment();
                     String privateKey = settingsFragment.getWalletPrivate();
                     String wallet_public = settingsFragment.getWalletAddress();
-                    Log.d(privateKey, "Private key success");
                     Credentials credentials = settingsFragment.getCredentials();
-                    //Log.d("Credentials", credentials.toString());
-                    //System.out.println("CREDENTIALS: " + credentials.toString());
-                    Log.d("Got Credentials", "Got Credentials");
                     String port = "5566";
                     String server_host = "10.42.0.1";
-                    Log.d("Attempting Socket", "now");
                     // [[ SEND: TRANSMISSION #0 ]]
 
                     try {
@@ -1011,7 +891,6 @@ public class ConnectionFragment extends Fragment {
                         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
                         //NEED TO REPLACE
-                        Log.d("public", wallet_public);
                         // [[ RECEIVE: TRANSMISSION #1 ]]
                         System.out.println(in.nextLine());
                         //Log.d(in.nextLine(), "Transmission 1");
@@ -1035,19 +914,9 @@ public class ConnectionFragment extends Fragment {
 
                         System.out.println("REPLY: " + Arrays.asList(aaa));
                         //Log.d("REPLY: " + Arrays.asList(aaa), "Recieved");
-                        String infura_api_key = "ef1ce1202d8248a69d1eacd3a6237f28"; //Might need to replace!
 
                         Web3j web3 = Web3j.build(new HttpService("https://ropsten.infura.io/v3/" + infura_api_key));  // defaults to http://localhost:8545/
 
-
-                        //Credentials credentials = WalletUtils.loadCredentials("password", "/path/to/walletfile");
-
-            /*TransactionReceipt transactionReceipt = Transfer.sendFunds(
-                    web3, credentials, aaa[1],
-                    BigDecimal.valueOf(0.01), Convert.Unit.ETHER).send(); */
-
-
-                        //Wallet wallet = new Wallet();
 
                         String contract = aaa[1];
                         String price = aaa[2];
@@ -1062,8 +931,6 @@ public class ConnectionFragment extends Fragment {
                         }
 
                         contractFund(web3, wallet_public, contract, credentials, price);
-
-                        //String result = wallet.sendTransaction(web3, wallet_public, contract, credentials, price);
 
                         // [[ SEND: TRANSMISSION #4 ]]
                         out.println("OK");
@@ -1094,18 +961,16 @@ public class ConnectionFragment extends Fragment {
 
                         if (!reply.equals("GO")) {
                             System.out.println("Nogo");
-                            //Log.d("Nogo", "");
                             out.println("bye");
                             socket.close();
                             return;
                         }
 
-                        long timestamp = SWFHelper.getTimestamp();
+                        long timestamp = getTimestamp();
                         String line = "";
 
 
                         System.out.println("Start loop");
-                        //Log.d("Start loop", "");
 
 
                         int chainsize = 60;
@@ -1115,7 +980,7 @@ public class ConnectionFragment extends Fragment {
                         Collections.reverse(fullHashChain);
 
 
-                        ConnectionFragment.startDupset();
+                        startDupset();
 
 
                          nbSleep(10000);
@@ -1135,7 +1000,7 @@ public class ConnectionFragment extends Fragment {
                                 break;
                             }
 
-                            if (ConnectionFragment.getSpeed() >= speed_min || i < testdrive_periods) {
+                            if (getSpeed() >= speed_min || i < testdrive_periods) {
                                 out.println("ack:" + fullHashChain.get(count));
                                 count++;
                                 double totalChargeTemp = count * 0.0012;
@@ -1160,6 +1025,14 @@ public class ConnectionFragment extends Fragment {
 
                             } else {
                                 out.println("TOOSLOW");
+                                mInstance.runOnUiThread (new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        timeWhenStopped = simpleChronometer.getBase() - SystemClock.elapsedRealtime();
+                                        simpleChronometer.stop();
+                                    }
+                                }));
+
                             }
 
                             try {
@@ -1182,9 +1055,6 @@ public class ConnectionFragment extends Fragment {
                                 }));
                             }
 
-                /* if(i == 6) {
-                    SWFHelper.nbSleep(subperiod_msec * 2);
-                } */
 
                             nbSleep(subperiod_msec);
                         }

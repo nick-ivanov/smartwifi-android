@@ -34,6 +34,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.thanosfisherman.wifiutils.WifiUtils;
 
@@ -82,7 +83,7 @@ public class HotspotFragment extends Fragment {
                 listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                        if(SettingsFragment.addr != null) {
+                        if(SettingsFragment.addr != null && SettingsFragment.infura != null) {
                             final AlertDialog.Builder myAlertDialog = new AlertDialog.Builder(getActivity());
                             final String ssid = listView.getItemAtPosition(position).toString();
                             final EditText input = new EditText(getActivity());
@@ -108,14 +109,15 @@ public class HotspotFragment extends Fragment {
                                     wifiSuccessToast.setGravity(Gravity.CENTER, 0, 0);
                                     if (isSuccess) {
                                         ConnectionFragment f = (ConnectionFragment) getFragmentManager().findFragmentByTag("connection");
+                                        SettingsFragment h = (SettingsFragment) getFragmentManager().findFragmentByTag("settings");
                                         String tempIp = ssid.substring(3);
                                         f.setIpAddress(true, tempIp);
                                         //f.setConnectionClock(true);
                                         f.setConnectedStatus(true);//we are connected
                                         f.setSSID(ssid);
                                         f.showDisconnect(true);
+                                        f.setSpeed_min(h.getSpeed_min());
                                         wifiSuccessToast.show();
-                                        SWFClient swfClient = new SWFClient();
                                         try {
                                             f.run2();
                                         } catch (Exception ex) {
@@ -140,7 +142,7 @@ public class HotspotFragment extends Fragment {
                             });
                             myAlertDialog.show();
                         } else{
-                            Toast privateKeyError = Toast.makeText(getActivity(), "Go to settings to enter private key", Toast.LENGTH_SHORT);
+                            Toast privateKeyError = Toast.makeText(getActivity(), "Go to settings to enter private key or Infura API", Toast.LENGTH_SHORT);
                             privateKeyError.setGravity(Gravity.CENTER, 0, 0);
                             privateKeyError.show();
                         }

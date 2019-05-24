@@ -70,18 +70,18 @@
 
 
 
-    <TextView
-        android:id="@+id/walletPrivateKey2"
-        android:layout_width="250dp"
-        android:layout_height="77dp"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:layout_weight="0"
-        android:text=""
-        android:textAllCaps="false"
-        android:textSize="13sp"
-        android:textStyle="bold" />
+    <!--<TextView-->
+        <!--android:id="@+id/walletPrivateKey2"-->
+        <!--android:layout_width="250dp"-->
+        <!--android:layout_height="77dp"-->
+        <!--android:layout_marginStart="@dimen/activity_horizontal_margin"-->
+        <!--android:layout_marginLeft="@dimen/activity_horizontal_margin"-->
+        <!--android:layout_marginTop="@dimen/activity_vertical_margin"-->
+        <!--android:layout_weight="0"-->
+        <!--android:text=""-->
+        <!--android:textAllCaps="false"-->
+        <!--android:textSize="13sp"-->
+        <!--android:textStyle="bold" />-->
 
     <Button
         android:id="@+id/saveBttn"
@@ -89,6 +89,35 @@
         android:layout_height="35dp"
         android:layout_marginLeft="90dp"
         android:text="Save" />
+
+    <TextView
+        android:id="@+id/infuraTextLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/walletAddress"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:text="Infura API Key: "
+        android:textAllCaps="false"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/infuraInput"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:hint="Infura API" />
+
+    <Button
+        android:id="@+id/saveBttn2"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_marginLeft="90dp"
+        android:text="Save" />
+
+
 
 
     <TextView
@@ -107,7 +136,7 @@
     <SeekBar
         android:id="@+id/seekBar"
         style="@style/Widget.AppCompat.SeekBar.Discrete"
-        android:layout_width="match_parent"
+        android:layout_width="267dp"
         android:layout_height="wrap_content"
         android:max="4"
         android:progress="2" />
@@ -115,12 +144,11 @@
 
     <TextView
         android:id="@+id/seekBarLabelPost"
-        android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/walletAddress"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:text="Medium (2 Mbps)"
         android:textAllCaps="false"
